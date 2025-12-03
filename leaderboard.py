@@ -13,8 +13,3 @@ def update_artist(name, score):
 
 def remove_artist(name):
     return client.zrem('artist_leaderboard', name)
-
-
-# pip install redis    
-# pip install Flask
-# docker run --name music-app-redis-instance -p 6379:6379 -d redis
