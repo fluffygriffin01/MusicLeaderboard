@@ -15,8 +15,8 @@ def get_top_ten_artists():
 def create_artist():
     try:
         data = request.json
-        artists_added = leaderboard.add_artist(data.get('name'), data.get('score'))
-        if artists_added > 0:
+        added_artist = leaderboard.add_artist(data.get('name'), data.get('score'))
+        if added_artist:
             return jsonify({"Succssessfully created artist": 200})
         else:
             raise Exception("Failed to create artist.")
@@ -27,8 +27,8 @@ def create_artist():
 def update_artist():
     try:
         data = request.json
-        artists_updated = leaderboard.update_artist(data.get('name'), data.get('score'))
-        if artists_updated > 0:
+        updated_artist = leaderboard.update_artist(data.get('name'), data.get('score'))
+        if updated_artist:
             return jsonify({"Succssessfully updated artist": 200})
         else:
             raise Exception("Failed to update artist.")
@@ -39,8 +39,8 @@ def update_artist():
 def delete_artist():
     try:
         data = request.json
-        artists_deleted = leaderboard.remove_artist(data.get('name'))
-        if artists_deleted > 0:
+        deleted_artist = leaderboard.remove_artist(data.get('name'))
+        if deleted_artist:
             return jsonify({"Succssessfully deleted artist": 200})
         else:
             return jsonify({"Artist not found": 200})

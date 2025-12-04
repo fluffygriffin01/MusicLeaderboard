@@ -8,6 +8,7 @@ deactivate                  (To deactivate venv)
 
 ## Setup:
 pip install -r requirements.txt  
+docker rm music-app-redis-instance (Remove if you instance already exists)  
 docker run --name music-app-redis-instance -p 6379:6379 -d redis  
 
 ## Execution:
