@@ -4,10 +4,11 @@ import seeder
 
 app = Flask(__name__)
 
-@app.route('/api/artist/seed/100', methods=['POST'])
+@app.route('/api/artist/seed', methods=['POST'])
 def seed_artists():    
     try:
-        count = seeder.seed_artists(100)
+        data = request.json
+        count = seeder.seed_artists(int(data.get('size')))
         return jsonify({
             'message': 'Successfully seeded artists',
             'count': count
@@ -18,10 +19,11 @@ def seed_artists():
             'error': str(e)
         }), 400
     
-@app.route('/api/artist/leaderboard/10', methods=['GET'])
-def get_top_ten_artists():    
+@app.route('/api/artist/leaderboard', methods=['GET'])
+def get_top_artists():    
     try:
-        response = controller.get_top_artists(10)
+        data = request.json
+        response = controller.get_top_artists(int(data.get('size')))
         return jsonify(response)
     except Exception as e:
         return jsonify({

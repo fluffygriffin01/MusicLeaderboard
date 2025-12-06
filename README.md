@@ -13,7 +13,7 @@ docker run --name music-app-redis-instance -p 6379:6379 -d redis
 python app.py
 
 ## In Postman:
-GET     http://localhost:6000/api/artist_leaderboard/10  
+GET     http://localhost:6000/api/artist_leaderboard   
 POST    http://localhost:6000/api/artist_leaderboard/create  
 PUT     http://localhost:6000/api/artist_leaderboard/update  
 DELETE  http://localhost:6000/api/artist_leaderboard/delete  
