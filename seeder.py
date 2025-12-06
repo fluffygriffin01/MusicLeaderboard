@@ -16,3 +16,9 @@ def seed_artists(count):
         if added_artist == True:
             added_amount += 1
     return added_amount
+
+def main():
+    seed_artists(50)
+
+if __name__ == "__main__":
+    main()
