@@ -3,19 +3,37 @@ import leaderboard
 
 app = Flask(__name__)
 
-@app.route('/api/artist_leaderboard/10', methods=['GET'])
+@app.route('/api/artist/leaderboard/10', methods=['GET'])
 def get_top_ten_artists():    
     try:
         response = leaderboard.get_top_artists(10)
         return jsonify(response)
     except Exception as e:
         return jsonify({"Failed to retrieve artist leaderboard": 500, "Error": str(e)})
+    
+@app.route('/api/artist/id', methods=['GET'])
+def get_artist_by_id():    
+    try:
+        data = request.json
+        response = leaderboard.get_artist_by_id(data.get('id'))
+        return jsonify(response)
+    except Exception as e:
+        return jsonify({"Failed to retrieve artist by id": 500, "Error": str(e)})
+    
+@app.route('/api/artist/name', methods=['GET'])
+def get_artist_by_name():    
+    try:
+        data = request.json
+        response = leaderboard.get_artist_by_name(data.get('name'))
+        return jsonify(response)
+    except Exception as e:
+        return jsonify({"Failed to retrieve artist by name": 500, "Error": str(e)})
 
-@app.route('/api/artist_leaderboard/create', methods=['POST'])
+@app.route('/api/artist/create', methods=['POST'])
 def create_artist():
     try:
         data = request.json
-        added_artist = leaderboard.add_artist(data.get('name'), data.get('score'))
+        added_artist = leaderboard.add_artist(data.get('name'), data.get('email'))
         if added_artist:
             return jsonify({"Succssessfully created artist": 200})
         else:
@@ -23,11 +41,12 @@ def create_artist():
     except Exception as e:
         return jsonify({"Failed to create artist": 400, "Error": str(e)})
     
-@app.route('/api/artist_leaderboard/update', methods=['PUT'])
+@app.route('/api/artist/update', methods=['PUT'])
 def update_artist():
     try:
         data = request.json
-        updated_artist = leaderboard.update_artist(data.get('name'), data.get('score'))
+        updated_artist = leaderboard.update_artist(int(data.get('id')), data.get('name'), data.get('email'), 
+            int(data.get('listeners')), int(data.get('followers')), int(data.get('songs')), int(data.get('albums')))
         if updated_artist:
             return jsonify({"Succssessfully updated artist": 200})
         else:
@@ -35,7 +54,7 @@ def update_artist():
     except Exception as e:
         return jsonify({"Failed to update artist": 400, "Error": str(e)})
     
-@app.route('/api/artist_leaderboard/delete', methods=['DELETE'])
+@app.route('/api/artist/delete', methods=['DELETE'])
 def delete_artist():
     try:
         data = request.json
