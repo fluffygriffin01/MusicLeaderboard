@@ -55,6 +55,16 @@ def update_artist(id, name, email, listeners, followers, songs, albums):
     updated_in_lookup = client.hset(f'name_to_artist_key:{name}', 'artist_key', artist_key) > 0
     return updated_in_artists and removed_from_leaderboard and updated_in_leaderboard and removed_from_lookup and updated_in_lookup
 
+def follow_artist(name):
+    if client.exists(f'name_to_artist_key:{name}') == False:
+        return
+    client.zincrby('artist_leaderboard_followers', 1, name)
+
+def unfollow_artist(name):
+    if client.exists(f'name_to_artist_key:{name}') == False:
+        return
+    client.zincrby('artist_leaderboard_followers', -1, name)
+
 def remove_artist(name):
     if client.exists(f'name_to_artist_key:{name}') == False:
         return False
