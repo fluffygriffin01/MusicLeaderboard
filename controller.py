@@ -1,6 +1,7 @@
 import redis
 
 client = redis.Redis(host='localhost', port=6379, decode_responses=True)
+MAX_RETRIES = 5
 
 
 def get_top_artists(size):
@@ -18,22 +19,50 @@ def get_artist_by_name(name):
     return artist_data
 
 def add_artist(name, email):
-    if client.exists(f'name_to_artist_key:{name}') == True:
+    retries = 0
+    while retries < MAX_RETRIES:
+        try:
+            if client.exists(f'name_to_artist_key:{name}') == True:
+                    return False
+            
+            with client.pipeline() as pipe:
+                pipe = client.pipeline()
+                pipe.watch(f'name_to_artist_key:{name}')
+                
+                artist_id = client.incr('next_artist_id')
+                artist_key = f'artist:{artist_id}'
+                artist_data = {
+                'name': name,
+                'email': email,
+                'listeners': 0,
+                'followers': 0,
+                'songs': 0,
+                'albums': 0
+                }
+
+                pipe.multi()
+                pipe.hset(artist_key, mapping=artist_data)
+                pipe.zadd('artist_leaderboard_followers', {name: 0}, nx=True)
+                pipe.hset(f'name_to_artist_key:{name}', 'artist_key', f'artist:{artist_id}')
+                pipe.execute()
+
+                return True
+
+        except redis.WatchError:
+            # If a watched key was modified by another client, the transaction fails
+            print("WatchError: Key modified, retrying transaction.")
+            retries += 1
+            continue  # Retry the transaction
+
+        except Exception as e:
+            # Handle other potential errors (e.g., connection issues)
+            print(f"An error occurred: {e}, retrying.")
+            retries += 1
+            continue
+
+    if retries == MAX_RETRIES:
+        print("Transaction failed after multiple retries.")
         return False
-    artist_id = client.incr('next_artist_id')
-    artist_key = f'artist:{artist_id}'
-    artist_data = {
-    'name': name,
-    'email': email,
-    'listeners': 0,
-    'followers': 0,
-    'songs': 0,
-    'albums': 0
-    }
-    added_to_artists = client.hset(artist_key, mapping=artist_data) > 0
-    added_to_leaderboard = client.zadd('artist_leaderboard_followers', {name: 0}, nx=True) > 0
-    added_to_lookup = client.hset(f'name_to_artist_key:{name}', 'artist_key', f'artist:{artist_id}') > 0
-    return added_to_artists and added_to_leaderboard and added_to_lookup
     
 def update_artist(id, name, email, listeners, followers, songs, albums):
     if client.exists(f'artist:{id}') == False:
