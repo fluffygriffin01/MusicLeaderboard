@@ -4,6 +4,8 @@ import time
 import random
 from faker import Faker
 
+THREADS_AMOUNT = 4
+SIMULATION_DURATION = 20
 fake = Faker()
 
 def generate_artist():
@@ -23,12 +25,23 @@ def seed_artists(count):
 def simulate_app_traffic(duration):
     time_simulating = 0
     while time_simulating < duration:
-        artist = random.choice(controller.get_top_artists(random.randint(100, 200)))
+        artist = None
+        try:
+            artist = random.choice(controller.get_top_artists(random.randint(100, 200)))
+        except IndexError:
+            artist = None
+        rng = random.random()
 
-        if random.random() > 0.4:
-            controller.follow_artist(artist[0])
+        if artist is not None:
+            if rng > 0.8:
+                controller.remove_artist(artist[0])
+            elif rng > 0.6:
+                controller.unfollow_artist(artist[0])
+            elif rng > 0.4:
+                controller.follow_artist(artist[0])
         else:
-            controller.unfollow_artist(artist[0])
+            artist_info = generate_artist()
+            controller.add_artist(artist_info['name'], artist_info['email'])
 
         delay = random.uniform(0.01, 1)
         time.sleep(delay)
@@ -36,10 +49,10 @@ def simulate_app_traffic(duration):
 
 def main():
     print(f'Simulating app traffic...')
-    seed_artists(100)
+    seed_artists(1)
     threads = []  
-    for _ in range(6):
-        thread = threading.Thread(target=simulate_app_traffic, kwargs={"duration": 20})
+    for _ in range(THREADS_AMOUNT):
+        thread = threading.Thread(target=simulate_app_traffic, kwargs={"duration": SIMULATION_DURATION})
         threads.append(thread)
         thread.start()
 
