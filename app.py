@@ -71,6 +71,30 @@ def update_artist():
             'error': str(e)
         }), 400
     
+@app.route('/api/artist/follow', methods=['PUT'])
+def follow_artist():    
+    try:
+        data = request.json
+        response = controller.follow_artist(data.get('name'))
+        return jsonify(response)
+    except Exception as e:
+        return jsonify({
+            'message': 'Failed to follow artist',
+            'error': str(e)
+        }), 400
+    
+@app.route('/api/artist/unfollow', methods=['PUT'])
+def follow_artist():    
+    try:
+        data = request.json
+        response = controller.unfollow_artist(data.get('name'))
+        return jsonify(response)
+    except Exception as e:
+        return jsonify({
+            'message': 'Failed to unfollow artist',
+            'error': str(e)
+        }), 400
+    
 @app.route('/api/artist/delete', methods=['DELETE'])
 def delete_artist():
     try:
