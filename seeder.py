@@ -4,16 +4,18 @@ import time
 import random
 from faker import Faker
 
+#Simulate number of users interacting
 THREADS_AMOUNT = 4
-SIMULATION_DURATION = 20
+SIMULATION_DURATION = 20 #runtime in seconds
 fake = Faker()
 
 def generate_artist():
     name = fake.name()
     email = fake.email()
-    return {"name": name, "email": email}
 
-def seed_artists(count):
+    return {"name": name, "email": email,}
+
+def seed_artists(count): #return how many artists succesfully added in leaderboard
     added_amount = 0
     for _ in range(count):
         artist_info = generate_artist()
@@ -43,13 +45,13 @@ def simulate_app_traffic(duration):
             artist_info = generate_artist()
             controller.add_artist(artist_info['name'], artist_info['email'])
 
-        delay = random.uniform(0.01, 1)
+        delay = random.uniform(0.01, 1) #delay to mimic real timing.
         time.sleep(delay)
         time_simulating += delay
 
 def main():
     print(f'Simulating app traffic...')
-    seed_artists(1)
+    seed_artists(1) # add minimum of 1 artist to leaderboard.
     threads = []  
     for _ in range(THREADS_AMOUNT):
         thread = threading.Thread(target=simulate_app_traffic, kwargs={"duration": SIMULATION_DURATION})
