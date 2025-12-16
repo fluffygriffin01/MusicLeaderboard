@@ -84,7 +84,8 @@ def follow_artist():
         }), 400
     
 @app.route('/api/artist/unfollow', methods=['PUT'])
-def follow_artist():    
+#def follow_artist():    
+def unfollow_artist():
     try:
         data = request.json
         response = controller.unfollow_artist(data.get('name'))
